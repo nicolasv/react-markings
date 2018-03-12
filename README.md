@@ -53,3 +53,24 @@ export default function CustomHeading() {
   `;
 }
 ```
+
+If you want to base your own [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
+on react-markings' parser validation, you can use `parse` to access the parsing result:
+
+```js
+import md from 'react-markings';
+
+function myTag(strings) {
+  var parseResult = md.parse(strings);
+  if (!parseResult.valid) {
+    throw new Error(parseResult.error);
+  }
+  
+  var expressions = Array.prototype.slice.call(arguments, 1);
+  // Do something with strings and expressions…  
+}
+```
+
+If you're using the same version of commonmark.js as react-markings, you can access the commonmark.js
+AST via `parseResult.ast` (where each of the tagged template expressions have been replaced by a
+paragraph with contents equal to `parse.PLACEHOLDER`).

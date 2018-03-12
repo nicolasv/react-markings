@@ -74,17 +74,30 @@ type Options = {
 };
 */
 
+function parse(strings /*: Array<string> */) {
+  var input = stripIndent(strings.join(PLACEHOLDER));
+  var ast = new Parser().parse(input);
+  if (!validate(ast)) {
+    return {
+      valid: false,
+      error: 'react-markings cannot interpolate React elements non-block positions'
+    }
+  }
+  return {
+    valid: true,
+    ast: ast
+  };
+}
+parse.PLACEHOLDER = PLACEHOLDER;
+
 function customize(opts /*: Options */) {
   let renderers = opts.renderers || {};
 
   return function markings(strings /*: Array<string> */ /*::, ...values: Array<ReactNode> */) {
     var values = Array.prototype.slice.call(arguments, 1);
-    var input = stripIndent(strings.join(PLACEHOLDER));
-    var parser = new Parser();
-    var ast = parser.parse(input);
-
-    if (!validate(ast)) {
-      throw new Error('react-markings cannot interpolate React elements non-block positions');
+    var parseResult = parse(strings);
+    if (!parseResult.valid) {
+      throw new Error(parseResult.error);
     }
 
     var index = 0;
@@ -106,10 +119,11 @@ function customize(opts /*: Options */) {
       })
     });
 
-    return React.createElement('div', {}, renderer.render(ast));
+    return React.createElement('div', {}, renderer.render(parseResult.ast));
   }
 }
 
 let md = customize({});
 md.customize = customize;
+md.parse = parse;
 module.exports = md;

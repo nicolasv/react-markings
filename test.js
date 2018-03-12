@@ -75,3 +75,8 @@ test('customize', () => {
     paragraph
   `)).toBe('<div><h1 class="fancy">Heading</h1><div>MyComponent</div><p class="blink">paragraph</p></div>');
 });
+
+test('parse', () => {
+  expect(typeof md.parse).toBe('function');
+  expect(typeof md.parse.PLACEHOLDER).toBe('string');
+});
